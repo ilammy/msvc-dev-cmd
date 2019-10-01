@@ -1,4 +1,4 @@
-<a href="https://github.com/ilammy/msvc-dev-cmd"><img alt="GitHub Actions status" src="https://github.com/ilammy/msvc-dev-cmd/workflows/setup-nasm/badge.svg"></a>
+<a href="https://github.com/ilammy/msvc-dev-cmd"><img alt="GitHub Actions status" src="https://github.com/ilammy/msvc-dev-cmd/workflows/msvc-dev-cmd/badge.svg"></a>
 
 # msvc-dev-cmd
 
