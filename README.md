@@ -10,13 +10,6 @@ Supports Windows. Does nothing on Linux and macOS.
 
 ## Inputs
 
-- `version` – version of NASM to install (default: 2.14.02)
-- `from-source` – set to `true` to always build from source, or `false` to never
-- `platform` – set binary platform to something non-standard
-- `destination` – target directory for download and installation (default: `$HOME/nasm`)
-
-Set true to build for Universal Windows Platform (i.e., for Windows Store)
-
 - `arch` – target architecture
   - native compilation: `x86`, `x64` (default), `amd64` (synonym for x64)
   - cross-compilation: `x86_amd64`, `x86_arm`, `x86_arm64`,
