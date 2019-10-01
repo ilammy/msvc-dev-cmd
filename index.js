@@ -84,9 +84,9 @@ async function main() {
         await fs.unlink(helper)
     }
 
-    for (string of environment) {
+    for (let string of environment) {
         const [name, value] = string.split('=')
-        for (pattern of InterestingVariables) {
+        for (let pattern of InterestingVariables) {
             if (name.match(pattern)) {
                 core.exportVariable(name, value)
                 break
