@@ -1,0 +1,24 @@
+name: msvc-dev-cmd
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - release/*
+
+jobs:
+  test:
+    name: default
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2016, windows-2019, windows-latest]
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v1
+      - name: Download Internet
+        run: npm install
+      - name: Enable Developer Command Prompt
+        uses: ./
