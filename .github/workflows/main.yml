@@ -22,3 +22,7 @@ jobs:
         run: npm install
       - name: Enable Developer Command Prompt
         uses: ./
+      - name: Compile and run some C code
+        run: |
+          cl.exe hello.c
+          hello.exe
