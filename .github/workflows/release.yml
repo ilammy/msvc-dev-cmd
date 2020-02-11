@@ -1,0 +1,25 @@
+name: msvc-dev-cmd (release)
+
+on:
+  push:
+    branches:
+      - release/*
+  schedule:
+    - cron: '0 6 * * *'
+
+jobs:
+  test:
+    name: release
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Setup Developer Command Prompt
+        uses: ilammy/msvc-dev-cmd@v1
+      - name: Check out source code
+        uses: actions/checkout@v1
+      - name: Compile and run some C code
+        shell: cmd
+        run: |
+          cl.exe hello.c
+          hello.exe
