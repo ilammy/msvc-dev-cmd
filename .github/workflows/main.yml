@@ -23,6 +23,7 @@ jobs:
       - name: Enable Developer Command Prompt
         uses: ./
       - name: Compile and run some C code
+        shell: cmd
         run: |
           cl.exe hello.c
           hello.exe
