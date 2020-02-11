@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - release/*
+      - wip/debugging
   schedule:
     - cron: '0 6 * * *'
 
