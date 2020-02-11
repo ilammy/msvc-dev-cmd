@@ -1,0 +1,11 @@
+name: Python package
+on: [push]
+jobs:
+  build:
+    runs-on: "windows-latest"
+    strategy:
+      matrix:
+        python-version:
+          - "2.7"
+    steps:
+    - uses: ilammy/msvc-dev-cmd@v1
