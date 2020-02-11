@@ -16,6 +16,13 @@ jobs:
     runs-on: windows-latest
     strategy:
       fail-fast: false
+      matrix:
+        python-version:
+          - '2.7'
+          - '3.5'
+          - '3.6'
+          - '3.7'
+          - '3.8'
     steps:
       - name: Check out source code
         uses: actions/checkout@v1
