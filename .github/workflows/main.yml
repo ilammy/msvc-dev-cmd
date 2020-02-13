@@ -6,15 +6,15 @@ on:
     branches:
       - master
       - release/*
+  schedule:
+    - cron: '0 6 * * *'
 
 jobs:
   test:
     name: default
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
     strategy:
       fail-fast: false
-      matrix:
-        os: [windows-2016, windows-2019, windows-latest]
     steps:
       - name: Check out source code
         uses: actions/checkout@v1
@@ -23,6 +23,15 @@ jobs:
       - name: Enable Developer Command Prompt
         uses: ./
       - name: Compile and run some C code
+        shell: cmd
         run: |
           cl.exe hello.c
           hello.exe
+  audit:
+    name: npm audit
+    runs-on: windows-latest
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v1
+      - run: npm install
+      - run: npm audit
