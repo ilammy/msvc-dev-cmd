@@ -14,6 +14,7 @@ const InterestingVariables = [
     'LIBPATH',
     'Path',
     'Platform',
+    'VisualStudioVersion',
     /^VCTools/,
     /^VSCMD_/,
     /^WindowsSDK/i,
