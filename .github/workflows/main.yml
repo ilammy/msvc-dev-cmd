@@ -34,4 +34,4 @@ jobs:
       - name: Check out source code
         uses: actions/checkout@v1
       - run: npm install
-      - run: npm audit
+      - run: npm audit --audit-level=moderate
