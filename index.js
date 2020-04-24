@@ -26,12 +26,12 @@ async function main() {
         return
     }
 
-    // this should generate an object like
-    // {
-    //     P2017: 'path\to\2017\Professional...',
-    //     C2017: 'path\to\2017\Entreprise...',
+    // this should generate an array like
+    // [
+    //     ['P2017', 'path\to\2017\Professional...'],
+    //     ['C2017', 'path\to\2017\Entreprise...'],
     //     etc...
-    // }
+    // [
     // Given the order of each list it should check
     // for the more recent versions first and the
     // highest grade edition first.
@@ -92,7 +92,6 @@ async function main() {
                @IF ERRORLEVEL 1 EXIT\n
                @SET`
 
-    console.log(script)
     core.debug(script)
 
     core.debug(`Writing helper file: ${helper}`)
