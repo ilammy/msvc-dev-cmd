@@ -35,14 +35,14 @@ async function main() {
     // Given the order of each list it should check
     // for the more recent versions first and the
     // highest grade edition first.
-    var search_map = {}
+    var search_map = []
 
     VERSIONS.forEach(ver => {
         EDITIONS.forEach(ed => {
-            let prop = ed.charAt(0) + ver
+            let label = ed.charAt(0) + ver
             let path = `%ProgramFiles(x86)%\\Microsoft Visual Studio\\${ver}\\${ed}\\VC\\Auxiliary\\Build\\vcvarsall.bat`
 
-            search_map[prop] = path
+            search_map.push([label, path])
         })
     })
 
@@ -75,18 +75,18 @@ async function main() {
 
     var script = '';
 
-    for(let key in search_map) {
-        script += `@IF EXIST "${search_map[key]}" GOTO :${key}\n`
-    }
+    search_map.forEach(pair => {
+        script += `@IF EXIST "${pair[1]}" GOTO :${pair[0]}\n`
+    })
 
     script += `@ECHO "Microsoft Visual Studio not found"\n
                @EXIT 1\n`
 
-    for(let key in search_map) {
-        script += `:${key}\n
-                   @CALL "${search_map[key]}" ${args.join(' ')}\n
+    search_map.forEach(pair => {
+        script += `:${pair[0]}\n
+                   @CALL "${pair[1]}" ${args.join(' ')}\n
                    @GOTO ENV\n`
-    }
+    })
 
     script += `:ENV\n
                @IF ERRORLEVEL 1 EXIT\n
