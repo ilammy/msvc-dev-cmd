@@ -34,14 +34,16 @@ async function main() {
     // }
     var search_map = {}
 
-    for(let ed in EDITIONS) {
-        for(let ver in VERSIONS) {
-            let prop = ed[0] + ver
+    EDITIONS.forEach(ed => {
+        VERSIONS.forEach(ver => {
+            let prop = ed.charAt(0) + ver
             let path = `%ProgramFiles(x86)%\\Microsoft Visual Studio\\${ver}\\${ed}\\VC\\Auxiliary\\Build\\vcvarsall.bat`
 
-            Object.defineProperty(search_map, prop, path)
-        }
-    }
+            search_map[prop] = path
+        })
+    })
+
+    core.debug(search_map)
 
     const arch    = core.getInput('arch')
     const sdk     = core.getInput('sdk')
@@ -89,6 +91,9 @@ async function main() {
                @IF ERRORLEVEL 1 EXIT\n
                @SET`
 
+    console.log(script)
+    core.debug(script)
+
     core.debug(`Writing helper file: ${helper}`)
     await fs.writeFile(helper, script)
 
@@ -120,4 +125,4 @@ async function main() {
     core.info(`Configured Developer Command Prompt`)
 }
 
-main().catch(() => core.setFailed('Could not setup Developer Command Prompt'))
+main().catch((e) => core.setFailed('Could not setup Developer Command Prompt: ' + e.message))
