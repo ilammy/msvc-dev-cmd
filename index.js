@@ -5,8 +5,8 @@ const os = require('os')
 const path = require('path')
 const process = require('process')
 
-const MSVS_2017 = '%ProgramFiles(x86)%\\Microsoft Visual Studio\\2017\\Enterprise\\VC\\Auxiliary\\Build'
-const MSVS_2019 = '%ProgramFiles(x86)%\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build'
+const EDITIONS = ['Community', 'Professional', 'Enterprise']
+const VERSIONS = ['2017', '2019']
 
 const InterestingVariables = [
     'INCLUDE',
@@ -24,6 +24,23 @@ async function main() {
     if (process.platform != 'win32') {
         core.info('This is not a Windows virtual environment, bye!')
         return
+    }
+
+    // this should generate an object like
+    // {
+    //     P2017: 'path\to\2017\Professional...',
+    //     C2017: 'path\to\2017\Entreprise...',
+    //     etc...
+    // }
+    var search_map = {}
+
+    for(let ed in EDITIONS) {
+        for(let ver in VERSIONS) {
+            let prop = ed[0] + ver
+            let path = `%ProgramFiles(x86)%\\Microsoft Visual Studio\\${ver}\\${ed}\\VC\\Auxiliary\\Build\\vcvarsall.bat`
+
+            Object.defineProperty(search_map, prop, path)
+        }
     }
 
     const arch    = core.getInput('arch')
@@ -53,22 +70,27 @@ async function main() {
     }
     core.debug(`Arguments: ${args.join(' ')}`)
 
+    var script = '';
+
+    for(let key in search_map) {
+        script += `@IF EXIST "${search_map[key]}" GOTO :${key}\n`
+    }
+
+    script += `@ECHO "Microsoft Visual Studio not found"\n
+               @EXIT 1\n`
+
+    for(let key in search_map) {
+        script += `:${key}\n
+                   @CALL "${search_map[key]}" ${args.join(' ')}\n
+                   @GOTO ENV\n`
+    }
+
+    script += `:ENV\n
+               @IF ERRORLEVEL 1 EXIT\n
+               @SET`
+
     core.debug(`Writing helper file: ${helper}`)
-    await fs.writeFile(helper, `
-        @IF EXIST "${MSVS_2017}\\vcvarsall.bat" GOTO :2017
-        @IF EXIST "${MSVS_2019}\\vcvarsall.bat" GOTO :2019
-        @ECHO "Microsoft Visual Studio not found"
-        @EXIT 1
-        :2017
-        @CALL "${MSVS_2017}\\vcvarsall.bat" ${args.join(' ')}
-        @GOTO ENV
-        :2019
-        @CALL "${MSVS_2019}\\vcvarsall.bat" ${args.join(' ')}
-        @GOTO ENV
-        :ENV
-        @IF ERRORLEVEL 1 EXIT
-        @SET
-    `)
+    await fs.writeFile(helper, script)
 
     var environment
     try {
