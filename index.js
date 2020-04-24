@@ -43,8 +43,6 @@ async function main() {
         })
     })
 
-    core.debug(search_map)
-
     const arch    = core.getInput('arch')
     const sdk     = core.getInput('sdk')
     const toolset = core.getInput('toolset')
