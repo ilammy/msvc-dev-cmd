@@ -5,8 +5,8 @@ const os = require('os')
 const path = require('path')
 const process = require('process')
 
-const EDITIONS = ['Community', 'Professional', 'Enterprise']
-const VERSIONS = ['2017', '2019']
+const EDITIONS = ['Enterprise', 'Professional', 'Community']
+const VERSIONS = ['2019', '2017']
 
 const InterestingVariables = [
     'INCLUDE',
@@ -32,10 +32,13 @@ async function main() {
     //     C2017: 'path\to\2017\Entreprise...',
     //     etc...
     // }
+    // Given the order of each list it should check
+    // for the more recent versions first and the
+    // highest grade edition first.
     var search_map = {}
 
-    EDITIONS.forEach(ed => {
-        VERSIONS.forEach(ver => {
+    VERSIONS.forEach(ver => {
+        EDITIONS.forEach(ed => {
             let prop = ed.charAt(0) + ver
             let path = `%ProgramFiles(x86)%\\Microsoft Visual Studio\\${ver}\\${ed}\\VC\\Auxiliary\\Build\\vcvarsall.bat`
 
