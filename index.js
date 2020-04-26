@@ -5,8 +5,8 @@ const os = require('os')
 const path = require('path')
 const process = require('process')
 
-const MSVS_2017 = '%ProgramFiles(x86)%\\Microsoft Visual Studio\\2017\\Enterprise\\VC\\Auxiliary\\Build'
-const MSVS_2019 = '%ProgramFiles(x86)%\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build'
+const EDITIONS = ['Enterprise', 'Professional', 'Community']
+const VERSIONS = ['2019', '2017']
 
 const InterestingVariables = [
     'INCLUDE',
@@ -25,6 +25,26 @@ async function main() {
         core.info('This is not a Windows virtual environment, bye!')
         return
     }
+
+    // this should generate an array like
+    // [
+    //     ['P2017', 'path\to\2017\Professional...'],
+    //     ['C2017', 'path\to\2017\Entreprise...'],
+    //     etc...
+    // [
+    // Given the order of each list it should check
+    // for the more recent versions first and the
+    // highest grade edition first.
+    var search_map = []
+
+    VERSIONS.forEach(ver => {
+        EDITIONS.forEach(ed => {
+            let label = ed.charAt(0) + ver
+            let path = `%ProgramFiles(x86)%\\Microsoft Visual Studio\\${ver}\\${ed}\\VC\\Auxiliary\\Build\\vcvarsall.bat`
+
+            search_map.push([label, path])
+        })
+    })
 
     const arch    = core.getInput('arch')
     const sdk     = core.getInput('sdk')
@@ -53,22 +73,29 @@ async function main() {
     }
     core.debug(`Arguments: ${args.join(' ')}`)
 
+    var script = '';
+
+    search_map.forEach(pair => {
+        script += `@IF EXIST "${pair[1]}" GOTO :${pair[0]}\n`
+    })
+
+    script += `@ECHO "Microsoft Visual Studio not found"\n
+               @EXIT 1\n`
+
+    search_map.forEach(pair => {
+        script += `:${pair[0]}\n
+                   @CALL "${pair[1]}" ${args.join(' ')}\n
+                   @GOTO ENV\n`
+    })
+
+    script += `:ENV\n
+               @IF ERRORLEVEL 1 EXIT\n
+               @SET`
+
+    core.debug(script)
+
     core.debug(`Writing helper file: ${helper}`)
-    await fs.writeFile(helper, `
-        @IF EXIST "${MSVS_2017}\\vcvarsall.bat" GOTO :2017
-        @IF EXIST "${MSVS_2019}\\vcvarsall.bat" GOTO :2019
-        @ECHO "Microsoft Visual Studio not found"
-        @EXIT 1
-        :2017
-        @CALL "${MSVS_2017}\\vcvarsall.bat" ${args.join(' ')}
-        @GOTO ENV
-        :2019
-        @CALL "${MSVS_2019}\\vcvarsall.bat" ${args.join(' ')}
-        @GOTO ENV
-        :ENV
-        @IF ERRORLEVEL 1 EXIT
-        @SET
-    `)
+    await fs.writeFile(helper, script)
 
     var environment
     try {
@@ -98,4 +125,4 @@ async function main() {
     core.info(`Configured Developer Command Prompt`)
 }
 
-main().catch(() => core.setFailed('Could not setup Developer Command Prompt'))
+main().catch((e) => core.setFailed('Could not setup Developer Command Prompt: ' + e.message))
