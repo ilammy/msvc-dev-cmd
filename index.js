@@ -31,6 +31,11 @@ function findVcvarsall() {
             }
         }
     }
+    // Special case for Visual Studio 2015 (and maybe earlier), try it out too.
+    const path = `${programFiles}\\Microsoft Visual C++ Build Tools\\vcbuildtools.bat`
+    if (fs.existsSync(path)) {
+        return path
+    }
     throw new Error('Microsoft Visual Studio not found')
 }
 
