@@ -1,6 +1,6 @@
 const core = require('@actions/core')
-const exec = require('util').promisify(require('child_process').exec)
 const child_process = require('child_process')
+const exec = require('util').promisify(child_process.exec)
 const fs = require('fs')
 const process = require('process')
 
