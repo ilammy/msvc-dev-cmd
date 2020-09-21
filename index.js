@@ -22,7 +22,7 @@ const InterestingVariables = [
 function findVcvarsall() {
     // use vswhere
     const path = child_process.execSync('vswhere -products * -latest -prerelease -find **/Auxiliary/Build/vcvarsall.bat').toString().trim()
-    if (fs.existsSync(path)) {
+    if (path && fs.existsSync(path)) {
         return path
     }
 
