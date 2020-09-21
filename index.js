@@ -43,6 +43,12 @@ function findVcvarsall() {
     if (fs.existsSync(path)) {
         return path
     }
+    // use vswhere
+    path = child_process.execSync('vswhere -products * -latest -prerelease -find **/vcbuildtools.bat').toString().trim()
+    if (path && fs.existsSync(path)) {
+        return path
+    }
+
     throw new Error('Microsoft Visual Studio not found')
 }
 
