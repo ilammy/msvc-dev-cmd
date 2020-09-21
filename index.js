@@ -21,7 +21,7 @@ const InterestingVariables = [
 
 function findVcvarsall() {
     // use vswhere
-    const path = child_process.execSync('vswhere -products * -latest -prerelease -find **/Auxiliary/Build/vcvarsall.bat').toString().trim()
+    let path = child_process.execSync('vswhere -products * -latest -prerelease -find **/Auxiliary/Build/vcvarsall.bat').toString().trim()
     if (path && fs.existsSync(path)) {
         return path
     }
@@ -32,14 +32,14 @@ function findVcvarsall() {
     // highest grade edition first.
     for (const ver of VERSIONS) {
         for (const ed of EDITIONS) {
-            const path = `${programFiles}\\Microsoft Visual Studio\\${ver}\\${ed}\\VC\\Auxiliary\\Build\\vcvarsall.bat`
+            path = `${programFiles}\\Microsoft Visual Studio\\${ver}\\${ed}\\VC\\Auxiliary\\Build\\vcvarsall.bat`
             if (fs.existsSync(path)) {
                 return path
             }
         }
     }
     // Special case for Visual Studio 2015 (and maybe earlier), try it out too.
-    const path = `${programFiles}\\Microsoft Visual C++ Build Tools\\vcbuildtools.bat`
+    path = `${programFiles}\\Microsoft Visual C++ Build Tools\\vcbuildtools.bat`
     if (fs.existsSync(path)) {
         return path
     }
