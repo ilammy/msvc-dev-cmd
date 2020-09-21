@@ -1,5 +1,6 @@
 const core = require('@actions/core')
 const exec = require('util').promisify(require('child_process').exec)
+const child_process = require('child_process')
 const fs = require('fs')
 const process = require('process')
 
@@ -19,6 +20,12 @@ const InterestingVariables = [
 ]
 
 function findVcvarsall() {
+    // use vswhere
+    const path = child_process.execSync('vswhere -products * -latest -prerelease -find **/Auxiliary/Build/vcvarsall.bat').toString().trim()
+    if (fs.existsSync(path)) {
+        return path
+    }
+
     const programFiles = process.env['ProgramFiles(x86)']
     // Given the order of each list it should check
     // for the more recent versions first and the
