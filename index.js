@@ -19,9 +19,17 @@ const InterestingVariables = [
     /^WindowsSDK/i,
 ]
 
+function findWithVswhere(pattern) {
+    let path = null;
+    try {
+        path = child_process.execSync(`vswhere -products * -latest -prerelease -find ${pattern}`).toString().trim()
+    } catch (e) {}
+    return path
+}
+
 function findVcvarsall() {
     // use vswhere
-    let path = child_process.execSync('vswhere -products * -latest -prerelease -find **/Auxiliary/Build/vcvarsall.bat').toString().trim()
+    let path = findWithVswhere('**/Auxiliary/Build/vcvarsall.bat')
     if (path && fs.existsSync(path)) {
         return path
     }
@@ -44,7 +52,7 @@ function findVcvarsall() {
         return path
     }
     // use vswhere
-    path = child_process.execSync('vswhere -products * -latest -prerelease -find **/vcbuildtools.bat').toString().trim()
+    path = findWithVswhere('**/vcbuildtools.bat')
     if (path && fs.existsSync(path)) {
         return path
     }
