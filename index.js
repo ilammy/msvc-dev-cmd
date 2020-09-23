@@ -47,16 +47,15 @@ function findVcvarsall() {
         }
     }
     // Special case for Visual Studio 2015 (and maybe earlier), try it out too.
-    path = `${programFiles}\\Microsoft Visual C++ Build Tools\\vcbuildtools.bat`
-    if (fs.existsSync(path)) {
-        return path
-    }
-    // use vswhere
+    // us vswhere
     path = findWithVswhere('**/vcbuildtools.bat')
     if (path && fs.existsSync(path)) {
         return path
     }
-
+    path = `${programFiles}\\Microsoft Visual C++ Build Tools\\vcbuildtools.bat`
+    if (fs.existsSync(path)) {
+        return path
+    }
     throw new Error('Microsoft Visual Studio not found')
 }
 
