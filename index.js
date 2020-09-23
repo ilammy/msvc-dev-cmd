@@ -23,7 +23,9 @@ function findWithVswhere(pattern) {
     let path = null;
     try {
         path = child_process.execSync(`vswhere -products * -latest -prerelease -find ${pattern}`).toString().trim()
-    } catch (e) {}
+    } catch (e) {
+        console.log(e)
+    }
     return path
 }
 
