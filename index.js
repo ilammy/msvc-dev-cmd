@@ -1,5 +1,6 @@
 const core = require('@actions/core')
-const exec = require('util').promisify(require('child_process').exec)
+const child_process = require('child_process')
+const exec = require('util').promisify(child_process.exec)
 const fs = require('fs')
 const process = require('process')
 
@@ -18,21 +19,42 @@ const InterestingVariables = [
     /^WindowsSDK/i,
 ]
 
+function findWithVswhere(pattern) {
+    let path = null;
+    try {
+        path = child_process.execSync(`vswhere -products * -latest -prerelease -find ${pattern}`).toString().trim()
+    } catch (e) {
+        console.log(e)
+    }
+    return path
+}
+
 function findVcvarsall() {
+    // use vswhere
+    let path = findWithVswhere('**/Auxiliary/Build/vcvarsall.bat')
+    if (path && fs.existsSync(path)) {
+        return path
+    }
+
     const programFiles = process.env['ProgramFiles(x86)']
     // Given the order of each list it should check
     // for the more recent versions first and the
     // highest grade edition first.
     for (const ver of VERSIONS) {
         for (const ed of EDITIONS) {
-            const path = `${programFiles}\\Microsoft Visual Studio\\${ver}\\${ed}\\VC\\Auxiliary\\Build\\vcvarsall.bat`
+            path = `${programFiles}\\Microsoft Visual Studio\\${ver}\\${ed}\\VC\\Auxiliary\\Build\\vcvarsall.bat`
             if (fs.existsSync(path)) {
                 return path
             }
         }
     }
     // Special case for Visual Studio 2015 (and maybe earlier), try it out too.
-    const path = `${programFiles}\\Microsoft Visual C++ Build Tools\\vcbuildtools.bat`
+    // us vswhere
+    path = findWithVswhere('**/vcbuildtools.bat')
+    if (path && fs.existsSync(path)) {
+        return path
+    }
+    path = `${programFiles}\\Microsoft Visual C++ Build Tools\\vcbuildtools.bat`
     if (fs.existsSync(path)) {
         return path
     }
