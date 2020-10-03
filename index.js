@@ -20,44 +20,43 @@ const InterestingVariables = [
 ]
 
 function findWithVswhere(pattern) {
-    let path = null;
     try {
-        path = child_process.execSync(`vswhere -products * -latest -prerelease -find ${pattern}`).toString().trim()
+        let installationPath = child_process.execSync(`vswhere -products * -latest -prerelease -property installationPath`).toString().trim()
+        return installationPath + '\\' + pattern
     } catch (e) {
-        console.log(e)
+        core.warn(`vswhere failed: ${e}`)
     }
-    return path
+    return null
 }
 
 function findVcvarsall() {
-    // use vswhere
-    let path = findWithVswhere('**/Auxiliary/Build/vcvarsall.bat')
+    // If vswhere is available, ask it about the location of the latest Visual Studio.
+    let path = findWithVswhere('VC\\Auxiliary\\Build\\vcvarsall.bat')
     if (path && fs.existsSync(path)) {
+        core.debug(`found with vswhere: ${path}`)
         return path
     }
 
+    // If that does not work, try the standard installation locations,
+    // starting with the latest and moving to the oldest.
     const programFiles = process.env['ProgramFiles(x86)']
-    // Given the order of each list it should check
-    // for the more recent versions first and the
-    // highest grade edition first.
     for (const ver of VERSIONS) {
         for (const ed of EDITIONS) {
             path = `${programFiles}\\Microsoft Visual Studio\\${ver}\\${ed}\\VC\\Auxiliary\\Build\\vcvarsall.bat`
             if (fs.existsSync(path)) {
+                core.debug(`found standard location: ${path}`)
                 return path
             }
         }
     }
+
     // Special case for Visual Studio 2015 (and maybe earlier), try it out too.
-    // us vswhere
-    path = findWithVswhere('**/vcbuildtools.bat')
-    if (path && fs.existsSync(path)) {
-        return path
-    }
     path = `${programFiles}\\Microsoft Visual C++ Build Tools\\vcbuildtools.bat`
     if (fs.existsSync(path)) {
+        core.debug(`found VS 2015: ${path}`)
         return path
     }
+
     throw new Error('Microsoft Visual Studio not found')
 }
 
