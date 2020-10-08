@@ -77,26 +77,6 @@ async function main() {
         return
     }
 
-    // this should generate an array like
-    // [
-    //     ['P2017', 'path\to\2017\Professional...'],
-    //     ['C2017', 'path\to\2017\Entreprise...'],
-    //     etc...
-    // [
-    // Given the order of each list it should check
-    // for the more recent versions first and the
-    // highest grade edition first.
-    var search_map = []
-
-    VERSIONS.forEach(ver => {
-        EDITIONS.forEach(ed => {
-            let label = ed.charAt(0) + ver
-            let path = `%ProgramFiles(x86)%\\Microsoft Visual Studio\\${ver}\\${ed}\\VC\\Auxiliary\\Build\\vcvarsall.bat`
-
-            search_map.push([label, path])
-        })
-    })
-
     const arch    = core.getInput('arch')
     const sdk     = core.getInput('sdk')
     const toolset = core.getInput('toolset')
