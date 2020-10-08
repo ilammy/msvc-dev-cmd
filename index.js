@@ -1,8 +1,7 @@
 const core = require('@actions/core')
-const execFile = require('util').promisify(require('child_process').execFile)
-const fs = require('fs').promises
-const os = require('os')
-const path = require('path')
+const child_process = require('child_process')
+const exec = require('util').promisify(child_process.exec)
+const fs = require('fs')
 const process = require('process')
 
 const EDITIONS = ['Enterprise', 'Professional', 'Community']
@@ -19,6 +18,47 @@ const InterestingVariables = [
     /^VSCMD_/,
     /^WindowsSDK/i,
 ]
+
+function findWithVswhere(pattern) {
+    try {
+        let installationPath = child_process.execSync(`vswhere -products * -latest -prerelease -property installationPath`).toString().trim()
+        return installationPath + '\\' + pattern
+    } catch (e) {
+        core.warn(`vswhere failed: ${e}`)
+    }
+    return null
+}
+
+function findVcvarsall() {
+    // If vswhere is available, ask it about the location of the latest Visual Studio.
+    let path = findWithVswhere('VC\\Auxiliary\\Build\\vcvarsall.bat')
+    if (path && fs.existsSync(path)) {
+        core.debug(`found with vswhere: ${path}`)
+        return path
+    }
+
+    // If that does not work, try the standard installation locations,
+    // starting with the latest and moving to the oldest.
+    const programFiles = process.env['ProgramFiles(x86)']
+    for (const ver of VERSIONS) {
+        for (const ed of EDITIONS) {
+            path = `${programFiles}\\Microsoft Visual Studio\\${ver}\\${ed}\\VC\\Auxiliary\\Build\\vcvarsall.bat`
+            if (fs.existsSync(path)) {
+                core.debug(`found standard location: ${path}`)
+                return path
+            }
+        }
+    }
+
+    // Special case for Visual Studio 2015 (and maybe earlier), try it out too.
+    path = `${programFiles}\\Microsoft Visual C++ Build Tools\\vcbuildtools.bat`
+    if (fs.existsSync(path)) {
+        core.debug(`found VS 2015: ${path}`)
+        return path
+    }
+
+    throw new Error('Microsoft Visual Studio not found')
+}
 
 async function main() {
     if (process.platform != 'win32') {
@@ -53,10 +93,7 @@ async function main() {
     const spectre = core.getInput('spectre')
 
     // Due to the way Microsoft Visual C++ is configured, we have to resort to the following hack:
-    // write a helper batch file which calls the configuration batch file and then outputs the
-    // configured environment variables, which we then pass to GitHub Actions.
-
-    const helper = path.join(os.homedir(), 'msvc-dev-cmd.bat')
+    // Call the configuration batch file and then output *all* the environment variables.
 
     var args = [arch]
     if (uwp == 'true') {
@@ -71,46 +108,11 @@ async function main() {
     if (spectre == 'true') {
         args.push('-vcvars_spectre_libs=spectre')
     }
-    core.debug(`Arguments: ${args.join(' ')}`)
 
-    var script = '';
-
-    search_map.forEach(pair => {
-        script += `@IF EXIST "${pair[1]}" GOTO :${pair[0]}\n`
-    })
-
-    script += `@ECHO "Microsoft Visual Studio not found"\n
-               @EXIT 1\n`
-
-    search_map.forEach(pair => {
-        script += `:${pair[0]}\n
-                   @CALL "${pair[1]}" ${args.join(' ')}\n
-                   @GOTO ENV\n`
-    })
-
-    script += `:ENV\n
-               @IF ERRORLEVEL 1 EXIT\n
-               @SET`
-
-    core.debug(script)
-
-    core.debug(`Writing helper file: ${helper}`)
-    await fs.writeFile(helper, script)
-
-    var environment
-    try {
-        core.debug('Executing helper')
-        const { stdout } = await execFile('cmd.exe', ['/q', '/c', helper])
-        environment = stdout.split('\r\n')
-    }
-    catch (error) {
-        core.debug(`Helper failed: ${error.message}`)
-        throw error
-    }
-    finally {
-        core.debug('Removing helper')
-        await fs.unlink(helper)
-    }
+    const command = `"${findVcvarsall()}" ${args.join(' ')} && set`
+    core.debug(`Running: ${command}`)
+    const { stdout } = await exec(command, {shell: "cmd"})
+    const environment = stdout.split('\r\n')
 
     for (let string of environment) {
         const [name, value] = string.split('=')
