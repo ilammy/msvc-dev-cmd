@@ -1,6 +1,5 @@
 const core = require('@actions/core')
 const child_process = require('child_process')
-const exec = require('util').promisify(child_process.exec)
 const fs = require('fs')
 const process = require('process')
 
@@ -71,7 +70,7 @@ function findVcvarsall() {
     throw new Error('Microsoft Visual Studio not found')
 }
 
-async function main() {
+function main() {
     if (process.platform != 'win32') {
         core.info('This is not a Windows virtual environment, bye!')
         return
@@ -102,7 +101,7 @@ async function main() {
 
     const command = `"${findVcvarsall()}" ${args.join(' ')} && set`
     core.debug(`Running: ${command}`)
-    const { stdout } = await exec(command, {shell: "cmd"})
+    const { stdout } = child_process.execSync(command, {shell: "cmd"})
     const environment = stdout.split('\r\n')
 
     for (let string of environment) {
@@ -118,4 +117,9 @@ async function main() {
     core.info(`Configured Developer Command Prompt`)
 }
 
-main().catch((e) => core.setFailed('Could not setup Developer Command Prompt: ' + e.message))
+try {
+    main()
+}
+catch (e) {
+    core.setFailed('Could not setup Developer Command Prompt: ' + e.message)
+}
