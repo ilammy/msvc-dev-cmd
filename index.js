@@ -4,8 +4,12 @@ const exec = require('util').promisify(child_process.exec)
 const fs = require('fs')
 const process = require('process')
 
+const PROGRAM_FILES_X86 = process.env['ProgramFiles(x86)']
+
 const EDITIONS = ['Enterprise', 'Professional', 'Community']
 const VERSIONS = ['2019', '2017']
+
+const VSWHERE = `${PROGRAM_FILES_X86}\\Microsoft Visual Studio\\Installer\\vswhere.exe`
 
 const InterestingVariables = [
     'INCLUDE',
@@ -24,8 +28,16 @@ function findWithVswhere(pattern) {
         let installationPath = child_process.execSync(`vswhere -products * -latest -prerelease -property installationPath`).toString().trim()
         return installationPath + '\\' + pattern
     } catch (e) {
-        core.warn(`vswhere failed: ${e}`)
+        core.warning(`vswhere failed: ${e}`)
     }
+
+    try {
+        let installationPath = child_process.execSync(`${VSWHERE} -products * -latest -prerelease -property installationPath`).toString().trim()
+        return installationPath + '\\' + pattern
+    } catch (e) {
+        core.warning(`vswhere failed: ${e}`)
+    }
+
     return null
 }
 
@@ -39,10 +51,9 @@ function findVcvarsall() {
 
     // If that does not work, try the standard installation locations,
     // starting with the latest and moving to the oldest.
-    const programFiles = process.env['ProgramFiles(x86)']
     for (const ver of VERSIONS) {
         for (const ed of EDITIONS) {
-            path = `${programFiles}\\Microsoft Visual Studio\\${ver}\\${ed}\\VC\\Auxiliary\\Build\\vcvarsall.bat`
+            path = `${PROGRAM_FILES_X86}\\Microsoft Visual Studio\\${ver}\\${ed}\\VC\\Auxiliary\\Build\\vcvarsall.bat`
             if (fs.existsSync(path)) {
                 core.debug(`found standard location: ${path}`)
                 return path
@@ -51,7 +62,7 @@ function findVcvarsall() {
     }
 
     // Special case for Visual Studio 2015 (and maybe earlier), try it out too.
-    path = `${programFiles}\\Microsoft Visual C++ Build Tools\\vcbuildtools.bat`
+    path = `${PROGRAM_FILES_X86}\\Microsoft Visual C++ Build Tools\\vcbuildtools.bat`
     if (fs.existsSync(path)) {
         core.debug(`found VS 2015: ${path}`)
         return path
