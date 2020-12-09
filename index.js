@@ -15,6 +15,7 @@ const InterestingVariables = [
     'INCLUDE',
     'LIB',
     'LIBPATH',
+    'VCINSTALLDIR',
     'Path',
     'Platform',
     'VisualStudioVersion',
