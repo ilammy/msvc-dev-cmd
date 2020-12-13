@@ -102,8 +102,7 @@ function main() {
 
     const command = `"${findVcvarsall()}" ${args.join(' ')} && set`
     core.debug(`Running: ${command}`)
-    const { stdout } = child_process.execSync(command, {shell: "cmd"})
-    const environment = stdout.split('\r\n')
+    const environment = child_process.execSync(command, {shell: "cmd"}).split('\r\n')
 
     for (let string of environment) {
         const [name, value] = string.split('=')
