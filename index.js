@@ -1,6 +1,5 @@
 const core = require('@actions/core')
 const child_process = require('child_process')
-const exec = require('util').promisify(child_process.exec)
 const fs = require('fs')
 const path = require('path')
 const process = require('process')
@@ -39,33 +38,37 @@ function findVcvarsall() {
     // If vswhere is available, ask it about the location of the latest Visual Studio.
     let path = findWithVswhere('VC\\Auxiliary\\Build\\vcvarsall.bat')
     if (path && fs.existsSync(path)) {
-        core.debug(`found with vswhere: ${path}`)
+        core.info(`Found with vswhere: ${path}`)
         return path
     }
+    core.info("Not found with vswhere")
 
     // If that does not work, try the standard installation locations,
     // starting with the latest and moving to the oldest.
     for (const ver of VERSIONS) {
         for (const ed of EDITIONS) {
             path = `${PROGRAM_FILES_X86}\\Microsoft Visual Studio\\${ver}\\${ed}\\VC\\Auxiliary\\Build\\vcvarsall.bat`
+            core.info(`Trying standard location: ${path}`)
             if (fs.existsSync(path)) {
-                core.debug(`found standard location: ${path}`)
+                core.info(`Found standard location: ${path}`)
                 return path
             }
         }
     }
+    core.info("Not found in standard locations")
 
     // Special case for Visual Studio 2015 (and maybe earlier), try it out too.
     path = `${PROGRAM_FILES_X86}\\Microsoft Visual C++ Build Tools\\vcbuildtools.bat`
     if (fs.existsSync(path)) {
-        core.debug(`found VS 2015: ${path}`)
+        core.info(`Found VS 2015: ${path}`)
         return path
     }
+    core.info(`Not found in VS 2015 location: ${path}`)
 
     throw new Error('Microsoft Visual Studio not found')
 }
 
-async function main() {
+function main() {
     if (process.platform != 'win32') {
         core.info('This is not a Windows virtual environment, bye!')
         return
@@ -99,8 +102,7 @@ async function main() {
 
     const command = `"${findVcvarsall()}" ${args.join(' ')} && set`
     core.debug(`Running: ${command}`)
-    const { stdout } = await exec(command, {shell: "cmd"})
-    const environment = stdout.split('\r\n')
+    const environment = child_process.execSync(command, {shell: "cmd"}).toString().split('\r\n')
 
     for (let string of environment) {
         const [name, value] = string.split('=')
@@ -115,4 +117,9 @@ async function main() {
     core.info(`Configured Developer Command Prompt`)
 }
 
-main().catch((e) => core.setFailed('Could not setup Developer Command Prompt: ' + e.message))
+try {
+    main()
+}
+catch (e) {
+    core.setFailed('Could not setup Developer Command Prompt: ' + e.message)
+}
