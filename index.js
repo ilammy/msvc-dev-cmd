@@ -2,6 +2,7 @@ const core = require('@actions/core')
 const child_process = require('child_process')
 const exec = require('util').promisify(child_process.exec)
 const fs = require('fs')
+const path = require('path')
 const process = require('process')
 
 const PROGRAM_FILES_X86 = process.env['ProgramFiles(x86)']
@@ -9,7 +10,7 @@ const PROGRAM_FILES_X86 = process.env['ProgramFiles(x86)']
 const EDITIONS = ['Enterprise', 'Professional', 'Community']
 const VERSIONS = ['2019', '2017']
 
-const VSWHERE = `${PROGRAM_FILES_X86}\\Microsoft Visual Studio\\Installer\\vswhere.exe`
+const VSWHERE_PATH = `${PROGRAM_FILES_X86}\\Microsoft Visual Studio\\Installer`
 
 const InterestingVariables = [
     'INCLUDE',
@@ -31,14 +32,6 @@ function findWithVswhere(pattern) {
     } catch (e) {
         core.warning(`vswhere failed: ${e}`)
     }
-
-    try {
-        let installationPath = child_process.execSync(`${VSWHERE} -products * -latest -prerelease -property installationPath`).toString().trim()
-        return installationPath + '\\' + pattern
-    } catch (e) {
-        core.warning(`vswhere failed: ${e}`)
-    }
-
     return null
 }
 
@@ -77,6 +70,9 @@ async function main() {
         core.info('This is not a Windows virtual environment, bye!')
         return
     }
+
+    // Add standard location of "vswhere" to PATH, in case it's not there.
+    process.env.PATH += path.delimiter + VSWHERE_PATH
 
     const arch    = core.getInput('arch')
     const sdk     = core.getInput('sdk')
