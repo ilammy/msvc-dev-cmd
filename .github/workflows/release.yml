@@ -11,13 +11,11 @@ jobs:
   test:
     name: release
     runs-on: windows-latest
-    strategy:
-      fail-fast: false
     steps:
       - name: Setup Developer Command Prompt
         uses: ilammy/msvc-dev-cmd@v1
       - name: Check out source code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
       - name: Compile and run some C code
         shell: cmd
         run: |
@@ -28,5 +26,5 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Check out source code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
       - run: npm audit --audit-level=moderate

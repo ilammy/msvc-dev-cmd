@@ -13,11 +13,9 @@ jobs:
   test:
     name: default
     runs-on: windows-latest
-    strategy:
-      fail-fast: false
     steps:
       - name: Check out source code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
       - name: Download Internet
         run: npm install
       - name: Enable Developer Command Prompt
@@ -32,6 +30,6 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Check out source code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
       - run: npm install
       - run: npm audit --audit-level=moderate
