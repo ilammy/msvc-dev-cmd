@@ -19,8 +19,14 @@ jobs:
         uses: actions/checkout@v2
       - name: Download Internet
         run: npm install
+      - name: What's in the env?
+        shell: cmd
+        run: set
       - name: Enable Developer Command Prompt
         uses: ./
+      - name: What's in the env now?
+        shell: cmd
+        run: set
       - name: Compile and run some C code
         shell: cmd
         run: |
