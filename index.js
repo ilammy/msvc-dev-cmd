@@ -104,6 +104,24 @@ function main() {
     core.debug(`Running: ${command}`)
     const environment = child_process.execSync(command, {shell: "cmd"}).toString().split('\r\n')
 
+    // If vsvars.bat is given an incorrect command line, it will print out
+    // an error and *still* exit successfully. Parse out errors from output
+    // which don't look like environment variables, and fail if appropriate.
+    var failed = false
+    for (let line of environment) {
+        if (line.match(/^\[ERROR.*\]/)) {
+            failed = true
+            // Don't print this particular line which will be confusing in output.
+            if (line.match(/Error in script usage. The correct usage is:$/)) {
+                continue
+            }
+            core.error(line)
+        }
+    }
+    if (failed) {
+        throw new Error('invalid parameters')
+    }
+
     for (let string of environment) {
         const [name, value] = string.split('=')
         for (let pattern of InterestingVariables) {
