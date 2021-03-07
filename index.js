@@ -77,11 +77,22 @@ function main() {
     // Add standard location of "vswhere" to PATH, in case it's not there.
     process.env.PATH += path.delimiter + VSWHERE_PATH
 
-    const arch    = core.getInput('arch')
+    var   arch    = core.getInput('arch')
     const sdk     = core.getInput('sdk')
     const toolset = core.getInput('toolset')
     const uwp     = core.getInput('uwp')
     const spectre = core.getInput('spectre')
+
+    // There are all sorts of way the architectures are called. In addition to
+    // values supported by Microsoft Visual C++, recognize some common aliases.
+    let arch_aliases = {
+        "win32": "x86",
+        "win64": "x64",
+    }
+    // Ignore case when matching as that's what humans expect.
+    if (arch.toLowerCase() in arch_aliases) {
+        arch = arch_aliases[arch.toLowerCase()]
+    }
 
     // Due to the way Microsoft Visual C++ is configured, we have to resort to the following hack:
     // Call the configuration batch file and then output *all* the environment variables.
@@ -103,6 +114,24 @@ function main() {
     const command = `"${findVcvarsall()}" ${args.join(' ')} && set`
     core.debug(`Running: ${command}`)
     const environment = child_process.execSync(command, {shell: "cmd"}).toString().split('\r\n')
+
+    // If vsvars.bat is given an incorrect command line, it will print out
+    // an error and *still* exit successfully. Parse out errors from output
+    // which don't look like environment variables, and fail if appropriate.
+    var failed = false
+    for (let line of environment) {
+        if (line.match(/^\[ERROR.*\]/)) {
+            failed = true
+            // Don't print this particular line which will be confusing in output.
+            if (line.match(/Error in script usage. The correct usage is:$/)) {
+                continue
+            }
+            core.error(line)
+        }
+    }
+    if (failed) {
+        throw new Error('invalid parameters')
+    }
 
     for (let string of environment) {
         const [name, value] = string.split('=')
