@@ -77,11 +77,22 @@ function main() {
     // Add standard location of "vswhere" to PATH, in case it's not there.
     process.env.PATH += path.delimiter + VSWHERE_PATH
 
-    const arch    = core.getInput('arch')
+    var   arch    = core.getInput('arch')
     const sdk     = core.getInput('sdk')
     const toolset = core.getInput('toolset')
     const uwp     = core.getInput('uwp')
     const spectre = core.getInput('spectre')
+
+    // There are all sorts of way the architectures are called. In addition to
+    // values supported by Microsoft Visual C++, recognize some common aliases.
+    let arch_aliases = {
+        "win32": "x86",
+        "win64": "x64",
+    }
+    // Ignore case when matching as that's what humans expect.
+    if (arch.toLowerCase() in arch_aliases) {
+        arch = arch_aliases[arch.toLowerCase()]
+    }
 
     // Due to the way Microsoft Visual C++ is configured, we have to resort to the following hack:
     // Call the configuration batch file and then output *all* the environment variables.
