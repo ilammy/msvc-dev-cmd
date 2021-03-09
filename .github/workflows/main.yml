@@ -28,7 +28,7 @@ jobs:
           hello.exe
       - name: Extra path
         shell: bash
-        run: echo "/tmp/extra" >> $GITHUB_PATH
+        run: echo "C:\\foo" >> $GITHUB_PATH
       - name: Check out bash env
         shell: bash
         run: |
