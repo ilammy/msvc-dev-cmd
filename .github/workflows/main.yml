@@ -6,6 +6,7 @@ on:
     branches:
       - master
       - release/*
+      - wip/bash
   schedule:
     - cron: '0 6 * * *'
 
@@ -27,6 +28,7 @@ jobs:
           hello.exe
   audit:
     name: npm audit
+    if: false
     runs-on: windows-latest
     steps:
       - name: Check out source code
@@ -35,6 +37,7 @@ jobs:
       - run: npm audit --audit-level=moderate
   alias-arch:
     name: arch aliases
+    if: false
     runs-on: windows-latest
     steps:
       - name: Check out source code
