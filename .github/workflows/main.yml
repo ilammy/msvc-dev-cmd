@@ -26,6 +26,12 @@ jobs:
         run: |
           cl.exe hello.c
           hello.exe
+      - name: Check out bash env
+        shell: bash
+        run: |
+          env
+          which link || :
+          which cl   || :
   audit:
     name: npm audit
     if: false
