@@ -42,6 +42,22 @@ jobs:
     # ...
 ```
 
+## Caveats
+
+### Name conflicts with `shell: bash`
+
+Using `shell: bash` in Actions may shadow some of the paths added by MSVC.
+In particular, `link.exe` (Microsoft C linker) is prone to be shadowed by `/usr/bin/link` (GNU filesystem link tool).
+
+Unfortunately, this happens because GitHub Actions unconditionally *prepend* GNU paths when `shell: bash` is used,
+on top of any paths set by `msvc-dev-cmd`, every time at the start of each new step.
+Hence, there aren't many non-destructive options here.
+
+If you experience compilation errors where `link` complains about unreasonable command-line arguments,
+“extra operand *something-something*” – that's probably it.
+Recommended workaround is to remove `/usr/bin/link` if that interferes with your builds.
+If this is not acceptable, please file an issue, then we'll figure out something better.
+
 ## License
 
 MIT, see [LICENSE](LICENSE).
