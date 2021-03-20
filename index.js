@@ -132,6 +132,7 @@ function main() {
     // Now look at the new environment and export everything that changed.
     // These are the variables set by vsvars.bat. Also export everything
     // that was not there during the first sweep: those are new variables.
+    core.startGroup('Environment variables')
     for (let string of new_environment) {
         // vsvars.bat likes to print some fluff at the beginning.
         // Skip lines that don't look like environment variables.
@@ -146,6 +147,7 @@ function main() {
             core.exportVariable(name, new_value)
         }
     }
+    core.endGroup()
 
     core.info(`Configured Developer Command Prompt`)
 }
