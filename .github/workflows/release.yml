@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - release/*
+      - new-windows
   schedule:
     - cron: '0 6 * * *'
 

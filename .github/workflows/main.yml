@@ -6,6 +6,7 @@ on:
     branches:
       - master
       - release/*
+      - new-windows
   schedule:
     - cron: '0 6 * * *'
 
