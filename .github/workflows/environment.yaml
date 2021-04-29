@@ -1,0 +1,19 @@
+name: z5-build-env
+channels:
+  - conda-forge
+dependencies:
+  - cmake
+  - compilers
+  - bzip2
+  - lz4-c
+  - xz
+  - zlib
+  - boost-cpp>=1.63
+  - xtensor>=0.21,<0.22
+  - xtensor-python>=0.24,<0.25
+  - xsimd
+  - blosc
+  - imageio
+  - nlohmann_json
+  - zarr
+  - h5py
