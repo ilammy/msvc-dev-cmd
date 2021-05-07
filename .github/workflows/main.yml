@@ -18,13 +18,42 @@ jobs:
         uses: actions/checkout@v2
       - name: Download Internet
         run: npm install
-      - name: Enable Developer Command Prompt
+      - name: Enable Developer Command Prompt (amd64)
         uses: ./
-      - name: Compile and run some C code
+        with:
+          arch: amd64
+      - name: Compile and run some C code (amd64)
         shell: cmd
         run: |
           cl.exe hello.c
           hello.exe
+      - name: Enable Developer Command Prompt (amd64_x86)
+        uses: ./
+        with:
+          arch: amd64_x86
+      - name: Compile and run some C code (x86)
+        shell: cmd
+        run: |
+          cl.exe hello.c
+          hello.exe
+      - name: Enable Developer Command Prompt (amd64_arm)
+        uses: ./
+        with:
+          arch: amd64_arm
+      - name: Compile some C code (arm)
+        shell: cmd
+        run: |
+          cl.exe hello.c
+          dumpbin /headers hello.exe
+      - name: Enable Developer Command Prompt (amd64_arm64)
+        uses: ./
+        with:
+          arch: amd64_arm64
+      - name: Compile some C code (arm64)
+        shell: cmd
+        run: |
+          cl.exe hello.c
+          dumpbin /headers hello.exe
   audit:
     name: npm audit
     runs-on: windows-latest
