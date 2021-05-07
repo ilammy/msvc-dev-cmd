@@ -55,6 +55,21 @@ function findVcvarsall() {
     throw new Error('Microsoft Visual Studio not found')
 }
 
+function isPathVariable(name) {
+    const pathLikeVariables = ['PATH', 'INCLUDE', 'LIB', 'LIBPATH']
+    return pathLikeVariables.indexOf(name.toUpperCase()) != -1
+}
+
+function filterPathValue(path) {
+    let paths = path.split(';')
+    // Remove duplicates by keeping the first occurance and preserving order.
+    // This keeps path shadowing working as intended.
+    function unique(value, index, self) {
+        return self.indexOf(value) === index
+    }
+    return paths.filter(unique).join(';')
+}
+
 function main() {
     if (process.platform != 'win32') {
         core.info('This is not a Windows virtual environment, bye!')
@@ -139,11 +154,18 @@ function main() {
         if (!string.includes('=')) {
             continue;
         }
-        const [name, new_value] = string.split('=')
-        const old_value = old_env_vars[name]
+        let [name, new_value] = string.split('=')
+        let old_value = old_env_vars[name]
         // For new variables "old_value === undefined".
         if (new_value !== old_value) {
             core.info(`Setting ${name}`)
+            // Special case for a bunch of PATH-like variables: vcvarsall.bat
+            // just prepends its stuff without checking if its already there.
+            // This makes repeated invocations of this action fail after some
+            // point, when the environment variable overflows. Avoid that.
+            if (isPathVariable(name)) {
+                new_value = filterPathValue(new_value)
+            }
             core.exportVariable(name, new_value)
         }
     }
