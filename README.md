@@ -30,12 +30,41 @@ Supports Windows. Does nothing on Linux and macOS.
 
 ## Example usage
 
+Basic usage for default compilation settings is like this:
+
 ```yaml
 jobs:
   test:
     steps:
       - uses: actions/checkout@v2
       - uses: ilammy/msvc-dev-cmd@v1
+      - name: Build something requiring CL.EXE
+        run: |
+          cmake -G "NMake Makefiles" .
+          nmake
+      # ...
+```
+
+If you want something non-default,
+like using a specific version of Visual Studio,
+or cross-compling for a differen target,
+you will need to configure those settings via inputs:
+
+```yaml
+jobs:
+  test:
+    # Run a job for each of the specified target architectures:
+    strategy:
+      matrix:
+        arch:
+          - amd64
+          - amd64_x86
+          - amd64_arm64
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch }}
       - name: Build something requiring CL.EXE
         run: |
           cmake -G "NMake Makefiles" .
