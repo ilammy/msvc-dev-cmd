@@ -33,7 +33,7 @@ Supports Windows. Does nothing on Linux and macOS.
 ```yaml
 jobs:
   test:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - uses: ilammy/msvc-dev-cmd@v1
     - name: Build something requiring CL.EXE
       run: |
