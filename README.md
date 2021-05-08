@@ -87,6 +87,48 @@ If you experience compilation errors where `link` complains about unreasonable c
 Recommended workaround is to remove `/usr/bin/link` if that interferes with your builds.
 If this is not acceptable, please file an issue, then we'll figure out something better.
 
+### Reconfiguration
+
+You can invoke `ilammy/msvc-dev-cmd` multiple times during your jobs with different inputs
+to reconfigure the environment for building with different settings
+(e.g., to target multiple architectures).
+
+```yaml
+jobs:
+  release:
+    steps:
+      # ...
+      - name: Configure build for amd64
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64
+
+      - run: build # (for amd64)
+
+      - name: Configure build for x86
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64_x86
+
+      - run: build # (for x86)
+
+      - name: Configure build for ARM64
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64_arm64
+
+      - run: build # (for ARM64)
+
+      # ...
+```
+
+This mostly works but it's not really recommended
+since Developer Command Prompt was not meant for recursive reconfiguration.
+That said, if it does not work for you, please file an issue.
+
+Consider using [`strategy.matrix`](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix)
+to execute different build configuration in parallel, independent environments.
+
 ## License
 
 MIT, see [LICENSE](LICENSE).
