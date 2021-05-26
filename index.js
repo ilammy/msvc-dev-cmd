@@ -122,19 +122,17 @@ function main() {
     // If vsvars.bat is given an incorrect command line, it will print out
     // an error and *still* exit successfully. Parse out errors from output
     // which don't look like environment variables, and fail if appropriate.
-    var failed = false
-    for (let line of new_environment) {
+    const error_messages = new_environment.filter((line) => {
         if (line.match(/^\[ERROR.*\]/)) {
-            failed = true
             // Don't print this particular line which will be confusing in output.
-            if (line.match(/Error in script usage. The correct usage is:$/)) {
-                continue
+            if (!line.match(/Error in script usage. The correct usage is:$/)) {
+                return true
             }
-            core.error(line)
         }
-    }
-    if (failed) {
-        throw new Error('invalid parameters')
+        return false
+    })
+    if (error_messages.length > 0) {
+        throw new Error('invalid parameters' + '\r\n' + error_messages.join('\r\n'))
     }
 
     // Convert old environment lines into a dictionary for easier lookup.
