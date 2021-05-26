@@ -1,11 +1,10 @@
 {
   "name": "msvc-dev-cmd",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "GitHub Action to setup Developer Command Prompt for Microsoft Visual C++",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint index.js",
-    "test": "eslint index.js"
+    "lint": "eslint index.js"
   },
   "repository": {
     "type": "git",
