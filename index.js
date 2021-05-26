@@ -116,14 +116,18 @@ function main() {
     const vcvars = `"${findVcvarsall()}" ${args.join(' ')}`
     core.debug(`vcvars command-line: ${vcvars}`)
 
-    const old_environment = child_process.execSync(`set`, {shell: "cmd"}).toString().split('\r\n')
-    const new_environment = child_process.execSync(`${vcvars} && set`, {shell: "cmd"}).toString().split('\r\n')
+    const cmd_output_string = child_process.execSync(`set && cls && ${vcvars} && cls && set`, {shell: "cmd"}).toString()
+    const cmd_output_parts = cmd_output_string.split('\f')
+
+    const old_environment = cmd_output_parts[0].split('\r\n')
+    const vcvars_output   = cmd_output_parts[1].split('\r\n')
+    const new_environment = cmd_output_parts[2].split('\r\n')
 
     // If vsvars.bat is given an incorrect command line, it will print out
     // an error and *still* exit successfully. Parse out errors from output
     // which don't look like environment variables, and fail if appropriate.
     var failed = false
-    for (let line of new_environment) {
+    for (let line of vcvars_output) {
         if (line.match(/^\[ERROR.*\]/)) {
             failed = true
             // Don't print this particular line which will be confusing in output.
