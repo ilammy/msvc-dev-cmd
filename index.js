@@ -90,6 +90,8 @@ function main() {
     let arch_aliases = {
         "win32": "x86",
         "win64": "x64",
+        "x86_64": "x64",
+        "x86-64": "x64",
     }
     // Ignore case when matching as that's what humans expect.
     if (arch.toLowerCase() in arch_aliases) {
