@@ -64,6 +64,7 @@ jobs:
         uses: actions/checkout@v2
       - run: npm install
       - run: npm audit --audit-level=moderate --production
+      - run: npm audit --audit-level=critical
   alias-arch:
     name: arch aliases
     runs-on: windows-latest

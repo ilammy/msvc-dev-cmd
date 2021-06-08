@@ -28,3 +28,4 @@ jobs:
       - name: Check out source code
         uses: actions/checkout@v2
       - run: npm audit --audit-level=moderate --production
+      - run: npm audit --audit-level=critical
