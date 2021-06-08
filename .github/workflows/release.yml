@@ -27,4 +27,4 @@ jobs:
     steps:
       - name: Check out source code
         uses: actions/checkout@v2
-      - run: npm audit --audit-level=moderate
+      - run: npm audit --audit-level=moderate --production

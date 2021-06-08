@@ -63,7 +63,7 @@ jobs:
       - name: Check out source code
         uses: actions/checkout@v2
       - run: npm install
-      - run: npm audit --audit-level=moderate
+      - run: npm audit --audit-level=moderate --production
   alias-arch:
     name: arch aliases
     runs-on: windows-latest
