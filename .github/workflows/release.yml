@@ -23,8 +23,9 @@ jobs:
           hello.exe
   audit:
     name: npm audit
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Check out source code
         uses: actions/checkout@v2
-      - run: npm audit --audit-level=moderate
+      - run: npm audit --audit-level=moderate --production
+      - run: npm audit --audit-level=critical
