@@ -70,7 +70,8 @@ function filterPathValue(path) {
     return paths.filter(unique).join(';')
 }
 
-function main() {
+/** See https://github.com/ilammy/msvc-dev-cmd#inputs */
+function setupMSVCDevCmd(arch, sdk, toolset, uwp, spectre) {
     if (process.platform != 'win32') {
         core.info('This is not a Windows virtual environment, bye!')
         return
@@ -78,12 +79,6 @@ function main() {
 
     // Add standard location of "vswhere" to PATH, in case it's not there.
     process.env.PATH += path.delimiter + VSWHERE_PATH
-
-    var   arch    = core.getInput('arch')
-    const sdk     = core.getInput('sdk')
-    const toolset = core.getInput('toolset')
-    const uwp     = core.getInput('uwp')
-    const spectre = core.getInput('spectre')
 
     // There are all sorts of way the architectures are called. In addition to
     // values supported by Microsoft Visual C++, recognize some common aliases.
@@ -176,6 +171,17 @@ function main() {
     core.endGroup()
 
     core.info(`Configured Developer Command Prompt`)
+}
+exports.setupMSVCDevCmd = setupMSVCDevCmd
+
+function main() {
+    var   arch    = core.getInput('arch')
+    const sdk     = core.getInput('sdk')
+    const toolset = core.getInput('toolset')
+    const uwp     = core.getInput('uwp')
+    const spectre = core.getInput('spectre')
+
+    setupMSVCDevCmd(arch, sdk, toolset, uwp, spectre)
 }
 
 try {
