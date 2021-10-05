@@ -5,6 +5,8 @@ const path = require('path')
 const process = require('process')
 
 const PROGRAM_FILES_X86 = process.env['ProgramFiles(x86)']
+const PROGRAM_FILES = [process.env['ProgramFiles(x86)'], process.env['ProgramFiles']]
+
 
 const EDITIONS = ['Enterprise', 'Professional', 'Community']
 const VERSIONS = ['2022', '2019', '2017']
@@ -32,16 +34,18 @@ function findVcvarsall() {
 
     // If that does not work, try the standard installation locations,
     // starting with the latest and moving to the oldest.
-    for (const ver of VERSIONS) {
-        for (const ed of EDITIONS) {
-            path = `${PROGRAM_FILES_X86}\\Microsoft Visual Studio\\${ver}\\${ed}\\VC\\Auxiliary\\Build\\vcvarsall.bat`
-            core.info(`Trying standard location: ${path}`)
-            if (fs.existsSync(path)) {
-                core.info(`Found standard location: ${path}`)
-                return path
-            }
-        }
-    }
+	  for (const prog_files of PROGRAM_FILES) {
+			for (const ver of VERSIONS) {
+					for (const ed of EDITIONS) {
+							path = `${prog_files}\\Microsoft Visual Studio\\${ver}\\${ed}\\VC\\Auxiliary\\Build\\vcvarsall.bat`
+							core.info(`Trying standard location: ${path}`)
+							if (fs.existsSync(path)) {
+									core.info(`Found standard location: ${path}`)
+									return path
+							}
+					}
+			}
+		}
     core.info("Not found in standard locations")
 
     // Special case for Visual Studio 2015 (and maybe earlier), try it out too.
