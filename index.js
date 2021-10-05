@@ -7,7 +7,7 @@ const process = require('process')
 const PROGRAM_FILES_X86 = process.env['ProgramFiles(x86)']
 
 const EDITIONS = ['Enterprise', 'Professional', 'Community']
-const VERSIONS = ['2019', '2017']
+const VERSIONS = ['2022', '2019', '2017']
 
 const VSWHERE_PATH = `${PROGRAM_FILES_X86}\\Microsoft Visual Studio\\Installer`
 
