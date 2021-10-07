@@ -1,6 +1,6 @@
 {
   "name": "msvc-dev-cmd",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "description": "GitHub Action to setup Developer Command Prompt for Microsoft Visual C++",
   "main": "index.js",
   "scripts": {
@@ -30,6 +30,6 @@
     "@actions/core": "^1.2"
   },
   "devDependencies": {
-    "eslint": "^6.8.0"
+    "eslint": "^7"
   }
 }
