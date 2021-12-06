@@ -60,9 +60,16 @@ exports.findWithVswhere = findWithVswhere
 
 function findVcvarsall(vsversion) {
     const vsversion_number = vsversion_to_versionnumber(vsversion)
+    let version_pattern
+    if (vsversion_number) {
+        const upper_bound = vsversion_number.split('.')[0] + '.9'
+        version_pattern = `-version "${vsversion_number},${upper_bound}"`
+    } else {
+        version_pattern = "-latest"
+    }
 
     // If vswhere is available, ask it about the location of the latest Visual Studio.
-    let path = findWithVswhere('VC\\Auxiliary\\Build\\vcvarsall.bat', vsversion_number ? `-version ${vsversion_number}` : "-latest")
+    let path = findWithVswhere('VC\\Auxiliary\\Build\\vcvarsall.bat', version_pattern)
     if (path && fs.existsSync(path)) {
         core.info(`Found with vswhere: ${path}`)
         return path
