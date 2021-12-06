@@ -9,23 +9,60 @@ const PROGRAM_FILES = [process.env['ProgramFiles(x86)'], process.env['ProgramFil
 
 
 const EDITIONS = ['Enterprise', 'Professional', 'Community']
-const VERSIONS = ['2022', '2019', '2017']
+const YEARS = ['2022', '2019', '2017']
+
+const VsYearVersion = {
+    '2022': '17.0',
+    '2019': '16.0',
+    '2017': '15.0',
+    '2015': '14.0',
+    '2013': '12.0',
+}
+
+function vsversion_to_versionnumber(vsversion) {
+    if (Object.values(VsYearVersion).includes(vsversion)) {
+        return vsversion
+    } else {
+        if (vsversion in VsYearVersion) {
+            return VsYearVersion[vsversion]
+        }
+    }
+    return vsversion
+}
+exports.vsversion_to_versionnumber = vsversion_to_versionnumber
+
+function vsversion_to_year(vsversion) {
+    if (Object.keys(VsYearVersion).includes(vsversion)) {
+        return vsversion
+    } else {
+        for (const [year, ver] of Object.entries(VsYearVersion)) {
+            if (ver === vsversion) {
+                return year
+            }
+        }
+    }
+    return vsversion
+}
+exports.vsversion_to_year = vsversion_to_year
 
 const VSWHERE_PATH = `${PROGRAM_FILES_X86}\\Microsoft Visual Studio\\Installer`
 
-function findWithVswhere(pattern) {
+function findWithVswhere(pattern, version_pattern) {
     try {
-        let installationPath = child_process.execSync(`vswhere -products * -latest -prerelease -property installationPath`).toString().trim()
+        let installationPath = child_process.execSync(`vswhere -products * ${version_pattern} -prerelease -property installationPath`).toString().trim()
         return installationPath + '\\' + pattern
     } catch (e) {
         core.warning(`vswhere failed: ${e}`)
     }
     return null
 }
+exports.findWithVswhere = findWithVswhere
 
-function findVcvarsall() {
+function findVcvarsall(vsversion) {
+    const vsversion_number = vsversion_to_versionnumber(vsversion)
+
     // If vswhere is available, ask it about the location of the latest Visual Studio.
-    let path = findWithVswhere('VC\\Auxiliary\\Build\\vcvarsall.bat')
+    let path = findWithVswhere('VC\\Auxiliary\\Build\\vcvarsall.bat', vsversion_number ? `-version ${vsversion_number}` : "-latest")
     if (path && fs.existsSync(path)) {
         core.info(`Found with vswhere: ${path}`)
         return path
@@ -34,8 +71,9 @@ function findVcvarsall() {
 
     // If that does not work, try the standard installation locations,
     // starting with the latest and moving to the oldest.
+    const years = vsversion ? [vsversion_to_year(vsversion)] : YEARS
     for (const prog_files of PROGRAM_FILES) {
-        for (const ver of VERSIONS) {
+        for (const ver of years) {
             for (const ed of EDITIONS) {
                 path = `${prog_files}\\Microsoft Visual Studio\\${ver}\\${ed}\\VC\\Auxiliary\\Build\\vcvarsall.bat`
                 core.info(`Trying standard location: ${path}`)
@@ -58,6 +96,7 @@ function findVcvarsall() {
 
     throw new Error('Microsoft Visual Studio not found')
 }
+exports.findVcvarsall = findVcvarsall
 
 function isPathVariable(name) {
     const pathLikeVariables = ['PATH', 'INCLUDE', 'LIB', 'LIBPATH']
@@ -75,7 +114,7 @@ function filterPathValue(path) {
 }
 
 /** See https://github.com/ilammy/msvc-dev-cmd#inputs */
-function setupMSVCDevCmd(arch, sdk, toolset, uwp, spectre) {
+function setupMSVCDevCmd(arch, sdk, toolset, uwp, spectre, vsversion) {
     if (process.platform != 'win32') {
         core.info('This is not a Windows virtual environment, bye!')
         return
@@ -114,7 +153,7 @@ function setupMSVCDevCmd(arch, sdk, toolset, uwp, spectre) {
         args.push('-vcvars_spectre_libs=spectre')
     }
 
-    const vcvars = `"${findVcvarsall()}" ${args.join(' ')}`
+    const vcvars = `"${findVcvarsall(vsversion)}" ${args.join(' ')}`
     core.debug(`vcvars command-line: ${vcvars}`)
 
     const cmd_output_string = child_process.execSync(`set && cls && ${vcvars} && cls && set`, {shell: "cmd"}).toString()
@@ -184,8 +223,9 @@ function main() {
     const toolset = core.getInput('toolset')
     const uwp     = core.getInput('uwp')
     const spectre = core.getInput('spectre')
+    const vsversion = core.getInput('vsversion')
 
-    setupMSVCDevCmd(arch, sdk, toolset, uwp, spectre)
+    setupMSVCDevCmd(arch, sdk, toolset, uwp, spectre, vsversion)
 }
 
 try {
