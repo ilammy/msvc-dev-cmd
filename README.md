@@ -71,6 +71,8 @@ jobs:
 - `uwp` – set `true` to build for Universal Windows Platform (i.e., for Windows Store)
 - `spectre` – set `true` to use Visual Studio libraries with [Spectre](https://meltdownattack.com) mitigations
 
+- `vsversion` - The Visual Studio version to use. This can be the version number (e.g. 16.0 for 2019) or the year (e.g. "2019").
+
 ## Caveats
 
 ### Name conflicts with `shell: bash`
