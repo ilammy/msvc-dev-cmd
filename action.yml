@@ -12,6 +12,8 @@ inputs:
     description: VC++ compiler toolset version
   uwp:
     description: Build for Universal Windows Platform
+  vsversion:
+    description: The Visual Studio version to use. This can be the version number (e.g. 16.0 for 2019) or the year (e.g. "2019").
 runs:
   using: node12
   main: index.js
