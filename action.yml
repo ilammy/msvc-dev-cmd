@@ -15,7 +15,7 @@ inputs:
   vsversion:
     description: The Visual Studio version to use. This can be the version number (e.g. 16.0 for 2019) or the year (e.g. "2019").
 runs:
-  using: node12
+  using: node16
   main: index.js
 branding:
   icon: terminal
