@@ -13,7 +13,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Setup Developer Command Prompt
-        uses: ilammy/msvc-dev-cmd@v1
+        uses: ilammy/msvc-dev-cmd@release/v1
       - name: Check out source code
         uses: actions/checkout@v2
       - name: Compile and run some C code
