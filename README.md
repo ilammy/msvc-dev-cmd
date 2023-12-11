@@ -27,7 +27,7 @@ jobs:
 
 If you want something non-default,
 like using a specific version of Visual Studio,
-or cross-compling for a differen target,
+or cross-compling for a different target,
 you will need to configure those settings via inputs:
 
 ```yaml
