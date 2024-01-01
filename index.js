@@ -8,7 +8,7 @@ const PROGRAM_FILES_X86 = process.env['ProgramFiles(x86)']
 const PROGRAM_FILES = [process.env['ProgramFiles(x86)'], process.env['ProgramFiles']]
 
 
-const EDITIONS = ['Enterprise', 'Professional', 'Community']
+const EDITIONS = ['Enterprise', 'Professional', 'Community', 'BuildTools']
 const YEARS = ['2022', '2019', '2017']
 
 const VsYearVersion = {
