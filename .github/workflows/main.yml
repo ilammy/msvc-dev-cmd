@@ -15,7 +15,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Check out source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Download Internet
         run: npm install
       - name: Run eslint
@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - run: npm install
       - run: npm audit --audit-level=moderate --production
       - run: npm audit --audit-level=critical
@@ -70,7 +70,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Check out source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Download Internet
         run: npm install
       - name: Enable Developer Command Prompt

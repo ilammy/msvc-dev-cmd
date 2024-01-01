@@ -16,7 +16,7 @@ Basic usage for default compilation settings is like this:
 jobs:
   test:
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Build something requiring CL.EXE
         run: |
@@ -41,7 +41,7 @@ jobs:
           - amd64_x86
           - amd64_arm64
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.arch }}
