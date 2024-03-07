@@ -70,8 +70,7 @@ jobs:
   - `14.XX.YYYYY` for a specific full version number (e.g, `14.11.25503`)
 - `uwp` – set `true` to build for Universal Windows Platform (i.e., for Windows Store)
 - `spectre` – set `true` to use Visual Studio libraries with [Spectre](https://meltdownattack.com) mitigations
-
-- `vsversion` - The Visual Studio version to use. This can be the version number (e.g. 16.0 for 2019) or the year (e.g. "2019").
+- `vsversion` – the Visual Studio version to use. This can be the version number (e.g. 16.0 for 2019) or the year (e.g. "2019"); omit this input to select the latest version of Visual Studio. On [GitHub-hosted runners](https://docs.github.com/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners), this input is not required because there is only one Visual Studio in the environment.
 
 ## Caveats
 
