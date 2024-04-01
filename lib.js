@@ -146,8 +146,8 @@ function filterPathValue(path) {
  * @param {string} arch - Target architecture
  * @param {string} sdk - Windows SDK number to build for
  * @param {string} toolset - VC++ compiler toolset version
- * @param {'true' | 'false'} uwp - Build for Universal Windows Platform
- * @param {'true' | 'false'} spectre - Enable Spectre mitigations
+ * @param {boolean | 'true' | 'false'} uwp - Build for Universal Windows Platform
+ * @param {boolean | 'true' | 'false'} spectre - Enable Spectre mitigations
  * @param {string} vsversion - The Visual Studio version to use. This can be the version number (e.g. 16.0 for 2019) or the year (e.g. "2019").
  */
 function setupMSVCDevCmd(arch, sdk, toolset, uwp, spectre, vsversion) {
@@ -176,7 +176,8 @@ function setupMSVCDevCmd(arch, sdk, toolset, uwp, spectre, vsversion) {
     // Call the configuration batch file and then output *all* the environment variables.
 
     var args = [arch]
-    if (uwp == 'true') {
+
+    if (uwp && JSON.parse(uwp) === true) {
         args.push('uwp')
     }
     if (sdk) {
@@ -185,7 +186,7 @@ function setupMSVCDevCmd(arch, sdk, toolset, uwp, spectre, vsversion) {
     if (toolset) {
         args.push(`-vcvars_ver=${toolset}`)
     }
-    if (spectre == 'true') {
+    if (spectre && JSON.parse(spectre) === true) {
         args.push('-vcvars_spectre_libs=spectre')
     }
 

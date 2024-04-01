@@ -32,15 +32,15 @@ export function findVcvarsall(version: string): string
  * @param {string} arch - Target architecture
  * @param {string} sdk - Windows SDK number to build for
  * @param {string} toolset - VC++ compiler toolset version
- * @param {'true' | 'false'} uwp - Build for Universal Windows Platform
- * @param {'true' | 'false'} spectre - Enable Spectre mitigations
+ * @param {boolean | 'true' | 'false'} uwp - Build for Universal Windows Platform
+ * @param {boolean | 'true' | 'false'} spectre - Enable Spectre mitigations
  * @param {string} vsversion - The Visual Studio version to use. This can be the version number (e.g. 16.0 for 2019) or the year (e.g. "2019").
  */
 export function setupMSVCDevCmd(
   arch: string,
   sdk?: string,
   toolset?: string,
-  uwp?: 'true' | 'false',
-  spectre?: 'true' | 'false',
+  uwp?: boolean | 'true' | 'false',
+  spectre?: boolean | 'true' | 'false',
   vsversion?: string,
 )
