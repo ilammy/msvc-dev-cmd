@@ -3,6 +3,8 @@
   "version": "1.13.0-dev",
   "description": "GitHub Action to setup Developer Command Prompt for Microsoft Visual C++",
   "main": "index.js",
+  "types": "./lib.d.ts",
+  "type": "commonjs",
   "scripts": {
     "lint": "eslint index.js"
   },

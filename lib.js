@@ -19,6 +19,11 @@ const VsYearVersion = {
     '2013': '12.0',
 }
 
+/**
+ * Convert the vs version (e.g. 2022) or year (e.g. 17.0) to the version number (e.g. 17.0)
+ * @param {string} vsversion the year (e.g. 2022) or version number (e.g. 17.0)
+ * @returns {string} the version number (e.g. 17.0)
+ */
 function vsversion_to_versionnumber(vsversion) {
     if (Object.values(VsYearVersion).includes(vsversion)) {
         return vsversion
@@ -31,6 +36,11 @@ function vsversion_to_versionnumber(vsversion) {
 }
 exports.vsversion_to_versionnumber = vsversion_to_versionnumber
 
+/**
+ * Convert the vs version (e.g. 17.0) or year (e.g. 2022) to the year (e.g. 2022)
+ * @param {string} vsversion the version number (e.g. 17.0) or year (e.g. 2022)
+ * @returns {string} the year (e.g. 2022)
+ */
 function vsversion_to_year(vsversion) {
     if (Object.keys(VsYearVersion).includes(vsversion)) {
         return vsversion
@@ -47,6 +57,12 @@ exports.vsversion_to_year = vsversion_to_year
 
 const VSWHERE_PATH = `${PROGRAM_FILES_X86}\\Microsoft Visual Studio\\Installer`
 
+/**
+ * Find MSVC tools with vswhere
+ * @param {string} pattern the pattern to search for
+ * @param {string} version_pattern the version pattern to search for
+ * @returns {string | null} the path to the found MSVC tools
+ */
 function findWithVswhere(pattern, version_pattern) {
     try {
         let installationPath = child_process.execSync(`vswhere -products * ${version_pattern} -prerelease -property installationPath`).toString().trim()
@@ -58,6 +74,11 @@ function findWithVswhere(pattern, version_pattern) {
 }
 exports.findWithVswhere = findWithVswhere
 
+/**
+ * Find the vcvarsall.bat file for the given Visual Studio version
+ * @param {string} vsversion the version of Visual Studio to find (year or version number)
+ * @returns {string} the path to the vcvarsall.bat file
+ */
 function findVcvarsall(vsversion) {
     const vsversion_number = vsversion_to_versionnumber(vsversion)
     let version_pattern
@@ -120,7 +141,15 @@ function filterPathValue(path) {
     return paths.filter(unique).join(';')
 }
 
-/** See https://github.com/ilammy/msvc-dev-cmd#inputs */
+/**
+ * Setup MSVC Developer Command Prompt
+ * @param {string} arch - Target architecture
+ * @param {string} sdk - Windows SDK number to build for
+ * @param {string} toolset - VC++ compiler toolset version
+ * @param {'true' | 'false'} uwp - Build for Universal Windows Platform
+ * @param {'true' | 'false'} spectre - Enable Spectre mitigations
+ * @param {string} vsversion - The Visual Studio version to use. This can be the version number (e.g. 16.0 for 2019) or the year (e.g. "2019").
+ */
 function setupMSVCDevCmd(arch, sdk, toolset, uwp, spectre, vsversion) {
     if (process.platform != 'win32') {
         core.info('This is not a Windows virtual environment, bye!')
