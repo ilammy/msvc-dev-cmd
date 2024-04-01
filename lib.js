@@ -21,8 +21,8 @@ const VsYearVersion = {
 
 /**
  * Convert the vs version (e.g. 2022) or year (e.g. 17.0) to the version number (e.g. 17.0)
- * @param {string} vsversion the year (e.g. 2022) or version number (e.g. 17.0)
- * @returns {string} the version number (e.g. 17.0)
+ * @param {string | undefined} vsversion the year (e.g. 2022) or version number (e.g. 17.0)
+ * @returns {string | undefined} the version number (e.g. 17.0)
  */
 function vsversion_to_versionnumber(vsversion) {
     if (Object.values(VsYearVersion).includes(vsversion)) {
@@ -76,7 +76,7 @@ exports.findWithVswhere = findWithVswhere
 
 /**
  * Find the vcvarsall.bat file for the given Visual Studio version
- * @param {string} vsversion the version of Visual Studio to find (year or version number)
+ * @param {string | undefined} vsversion the version of Visual Studio to find (year or version number)
  * @returns {string} the path to the vcvarsall.bat file
  */
 function findVcvarsall(vsversion) {
@@ -144,11 +144,11 @@ function filterPathValue(path) {
 /**
  * Setup MSVC Developer Command Prompt
  * @param {string} arch - Target architecture
- * @param {string} sdk - Windows SDK number to build for
- * @param {string} toolset - VC++ compiler toolset version
- * @param {boolean | 'true' | 'false'} uwp - Build for Universal Windows Platform
- * @param {boolean | 'true' | 'false'} spectre - Enable Spectre mitigations
- * @param {string} vsversion - The Visual Studio version to use. This can be the version number (e.g. 16.0 for 2019) or the year (e.g. "2019").
+ * @param {string | undefined} sdk - Windows SDK number to build for
+ * @param {string | undefined} toolset - VC++ compiler toolset version
+ * @param {boolean | 'true' | 'false' | undefined} uwp - Build for Universal Windows Platform
+ * @param {boolean | 'true' | 'false' | undefined} spectre - Enable Spectre mitigations
+ * @param {string | undefined} vsversion - The Visual Studio version to use. This can be the version number (e.g. 16.0 for 2019) or the year (e.g. "2019").
  */
 function setupMSVCDevCmd(arch, sdk, toolset, uwp, spectre, vsversion) {
     if (process.platform != 'win32') {
